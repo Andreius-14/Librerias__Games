@@ -11,7 +11,40 @@ const RIGHT = 2
 const DOWN = 3
 const LEFT = 4
 
-//Array de Imagen
+const rules = {
+    BLANK: [
+        [BLANK, UP],
+        [BLANK, RIGHT],
+        [BLANK, DOWN],
+        [BLANK, LEFT]
+    ],
+    UP: [
+        [RIGHT, LEFT, DOWN],
+        [LEFT, UP, DOWN],
+        [BLANK, DOWN],
+        [RIGHT, UP, DOWN]
+    ],
+    RIGHT: [
+        [RIGHT, LEFT, DOWN],
+        [LEFT, UP, DOWN],
+        [RIGHT, LEFT, UP],
+        [BLANK, LEFT]
+    ],
+    DOWN: [
+        [BLANK, UP],
+        [LEFT, UP, DOWN],
+        [RIGHT, LEFT, UP],
+        [RIGHT, UP, DOWN]
+    ],
+    LEFT: [
+        [RIGHT, LEFT, DOWN],
+        [BLANK, RIGHT],
+        [RIGHT, LEFT, UP],
+        [UP, DOWN, RIGHT]
+    ]
+}
+
+// Array de Imagen
 function preload() {
     tiles[0] = loadImage('./tiles/blank.png')
     tiles[1] = loadImage('./tiles/up.png')
@@ -20,11 +53,11 @@ function preload() {
     tiles[4] = loadImage('./tiles/left.png')
 }
 
-//Array de Objetos
+// Array de Objetos
 function setup() {
     createCanvas(600, 600)
     for (let i = 0; i < DIM * DIM; i++) {
-        //Propiedades x Celda
+        // Propiedades x Celda
         grid[i] = {
             collapse: false,
             options: [BLANK, UP, RIGHT, DOWN, LEFT]
@@ -40,21 +73,21 @@ function draw() {
     background(0)
 
     // Pick cell with least entropy
-    const gridCopy = grid.slice();
+    const gridCopy = grid.slice()
 
-    //Ordena -- Menor a Mayor -- grid[].options
+    // Ordena -- Menor a Mayor -- grid[].options
     gridCopy.sort((a, b) => {
-        return a.options.length - b.options.length;
+        return a.options.length - b.options.length
     })
 
     // Num de Obsiones (La menor posible)
-    let len = gridCopy[0].options.length;
-    let stopIndex = 0;
+    const len = gridCopy[0].options.length
+    let stopIndex = 0
     // recorre --- Busca la primera Casilla + con un numero mayor de Opciones
     for (let i = 1; i < gridCopy.length; i++) {
         if (gridCopy[i].options.length > len) {
-            stopIndex = i;
-            break;
+            stopIndex = i
+            break
         }
     }
     // Filtra el array: Mantiene solo las opciones con la menor longitud (mínima entropía).
@@ -65,28 +98,28 @@ function draw() {
     //
 
     // Seleccion Random - []
-    const cell = random(gridCopy);
-    cell.collapsed = true;
+    const cell = random(gridCopy)
+    cell.collapsed = true
     // Seleccion Random - pic
-    const pick = random(cell.options);
-    cell.options = [pick];
+    const pick = random(cell.options)
+    cell.options = [pick]
 
-    //Mensaje
-    console.log(grid);
-    console.log(gridCopy);
+    // Mensaje
+    console.log(grid)
+    console.log(gridCopy)
 
     // widht , height - propiedades de canvas p5.js
     const w = width / DIM
     const h = height / DIM
 
-    //Recorre --- el Grid
+    // Recorre --- el Grid
     for (let j = 0; j < DIM; j++) {
         for (let i = 0; i < DIM; i++) {
             const cell = grid[i + j * DIM]
 
             if (cell.collapsed) {
-                //traduce la unica opcion que posee a Imagen
-                let index = cell.options[0]
+                // traduce la unica opcion que posee a Imagen
+                const index = cell.options[0]
                 image(tiles[index], i * w, j * h, w, h)
             } else {
                 fill(0)
