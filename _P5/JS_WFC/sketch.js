@@ -42,7 +42,7 @@ function draw() {
 
             if (cell.collapsed) {
                 let index = cell.options[0]
-                image(tiles[index], i * w, j * h)
+                image(tiles[index], i * w, j * h,w,h)
             } else {
                 fill(0)
                 stroke(255)
