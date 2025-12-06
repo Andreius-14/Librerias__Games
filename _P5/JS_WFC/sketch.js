@@ -14,52 +14,78 @@ const RIGHT = 2
 const DOWN = 3
 const LEFT = 4
 
+//          ╭─────────────────────────────────────────────────────────╮
+//          │                 Restricciones por Tile                  │
+//          ╰─────────────────────────────────────────────────────────╯
+//           rules[tile][dir] indica QUÉ tiles pueden colocarse en la
+//           dirección "dir" respecto al tile actual.
+//
+//           dir index:
+//          ╭─────────────────────────────────────────────────────────╮
+//          │     0 = ↑  (qué puede ir ARRIBA de este tile)           │
+//          │     1 = →  (qué puede ir a la DERECHA de este tile)     │
+//          │     2 = ↓  (qué puede ir ABAJO de este tile)            │
+//          │     3 = ←  (qué puede ir a la IZQUIERDA de este tile)   │
+//          ╰─────────────────────────────────────────────────────────╯
+//
+//           Ejemplo visual del concepto:
+//
+//          ╭─────────────────────────────────────────────────────────────╮
+//          │ ┌─────┐        rules[X][0] = lista de tiles permitidos aquí │
+//          │ │  ?  │   ↑                                                 │
+//          │ ├─────┤   X     ← tile actual                               │
+//          │ │  X  │   ↓                                                 │
+//          │ └─────┘        rules[X][2] = lista de tiles permitidos aquí │               │
+//          ╰─────────────────────────────────────────────────────────────╯
+//
+//           Esto hace que leer las reglas sea literal “tabla de compatibilidad”.
+
 const rules = [
     //  ╭─────────────────╮
     //  │      blank      │
     //  ╰─────────────────╯
     [
-        [BLANK, UP],
-        [BLANK, RIGHT],
-        [BLANK, DOWN],
-        [BLANK, LEFT]
+        /* [↑] */[BLANK, UP],
+        /* [→] */[BLANK, RIGHT],
+        /* [↓] */[BLANK, DOWN],
+        /* [←] */[BLANK, LEFT]
     ],
     //  ╭─────────────────╮
     //  │        UP       │
     //  ╰─────────────────╯
     [
-        [RIGHT, LEFT, DOWN],
-        [LEFT, UP, DOWN],
-        [BLANK, DOWN],
-        [RIGHT, UP, DOWN]
+        /* [↑] */[RIGHT, LEFT, DOWN],
+        /* [→] */[LEFT, UP, DOWN],
+        /* [↓] */[BLANK, DOWN],
+        /* [←] */[RIGHT, UP, DOWN]
     ],
     //  ╭─────────────────╮
     //  │      Right      │
     //  ╰─────────────────╯
 
     [
-        [RIGHT, LEFT, DOWN],
-        [LEFT, UP, DOWN],
-        [RIGHT, LEFT, UP],
-        [BLANK, LEFT]
+        /* [↑] */[RIGHT, LEFT, DOWN],
+        /* [→] */[LEFT, UP, DOWN],
+        /* [↓] */[RIGHT, LEFT, UP],
+        /* [←] */[BLANK, LEFT]
     ],
     //  ╭─────────────────╮
     //  │      Down       │
     //  ╰─────────────────╯
     [
-        [BLANK, UP],
-        [LEFT, UP, DOWN],
-        [RIGHT, LEFT, UP],
-        [RIGHT, UP, DOWN]
+        /* [↑] */[BLANK, UP],
+        /* [→] */[LEFT, UP, DOWN],
+        /* [↓] */[RIGHT, LEFT, UP],
+        /* [←] */[RIGHT, UP, DOWN]
     ],
     //  ╭─────────────────╮
     //  │       Left      │
     //  ╰─────────────────╯
     [
-        [RIGHT, LEFT, DOWN],
-        [BLANK, RIGHT],
-        [RIGHT, LEFT, UP],
-        [UP, DOWN, RIGHT]
+        /* [↑] */[RIGHT, LEFT, DOWN],
+        /* [→] */[BLANK, RIGHT],
+        /* [↓] */[RIGHT, LEFT, UP], // ↓
+        /* [←] */[UP, DOWN, RIGHT] // ←
     ]
 ]
 
@@ -143,29 +169,30 @@ function draw() {
     //          ╰─────────────────────────────────────────────────────────╯
 
     // Duplica
+    // GameOver -- Si no hay casillas que llenar Detiene todo
+    // Filtra -- Casillas sin Imagen
+    // Ordena -- Menor a Mayor
+    // Group  -- Agrupa las celdas con Menores Opciones. ejm: las de 1 Opcion ||  las de 2 Opciones
+
+    // [Duplica]
     let gridCopy = grid.slice()
 
-    //  Casillas sin Imagen
-    gridCopy = gridCopy.filter((a) => !a.collapsed)
-
-    // console.table(grid);
-    // console.table(gridCopy)
-
-    // Condificonal : Finaliza Si todo esta lleno
+    // [GameOver]
     if (gridCopy.length == 0) {
         return
     }
+    // [Filtra]
+    gridCopy = gridCopy.filter((a) => !a.collapsed)
 
-    // Ordena -- Menor a Mayor
+    // [Ordena]
     gridCopy.sort((a, b) => {
         return a.options.length - b.options.length
     })
 
-    // Selecciona > la array[0] cantidad de Opciones
+    // [Group]
     const len = gridCopy[0].options.length
     let stopIndex = 0
 
-    // Filtra el array: Mantiene solo las opciones-grid con la menor longitud (mínima entropía).
     for (let i = 1; i < gridCopy.length; i++) {
         if (gridCopy[i].options.length > len) {
             stopIndex = i
@@ -175,10 +202,10 @@ function draw() {
     if (stopIndex > 0) gridCopy.splice(stopIndex)
 
     //          ╭─────────────────────────────────────────────────────────╮
-    //          │                    Aplicando Entriopia                  │
+    //          │     Aplicando Entriopia : Habilita  Imagen a Pintar     │
     //          ╰─────────────────────────────────────────────────────────╯
 
-    // Seleccion Random - []
+    // Seleccion Random - [] y Tile
     const cell = random(gridCopy)
     const pick = random(cell.options)
 
@@ -197,25 +224,42 @@ function draw() {
         for (let i = 0; i < DIM; i++) {
             const index = i + (j * DIM)
 
-            const celda = {
-                up: grid[i + (j - 1) * DIM],
-                right: grid[i + 1 + j * DIM],
-                down: grid[i + (j + 1) * DIM],
-                left: grid[i - 1 + j * DIM]
-            }
-
             if (grid[index].collapsed) {
                 // ────────────── Guardando Estado ──────────────
                 nextGrid[index] = grid[index]
             } else {
+                // ╭─────────────────────────────────────────────────────────╮
+                // │     Pasa por una capa de DEPURACION -- por cada IF,     │
+                // │Dejando aquel que cumple las restriciones de los vecinos │
+                // ╰─────────────────────────────────────────────────────────╯
                 const options = [BLANK, UP, RIGHT, DOWN, LEFT]
 
                 // ──────────────── recorre lados ────────────────
+                // Se ejecuta en la Celda Vacia
+                // La celda Vacia - Tiene Vecinos
+
+                // ──────────────── Logica  UP ────────────────
+                // Options  : los posibles TILES Del Vecino          >>> options: [BLANK, UP, RIGHT, DOWN, LEFT]
+                // Options  : Si esta lleno tiene 1 Tile Definido    >>> options: [valor_establecido]
+                //
+                // Ubicacion Actual: Abajo del Vecino
+                // Restriccion     : Elejimos la restriccion Abajo del Vecino  [2]
+                // ╭──────╮
+                // │[0][↑]│
+                // │[1][→]│
+                // │[2][↓]│
+                // │[3][←]│
+                // ╰──────╯
+
+                // ╭─────────────────────────────────────────────────────────╮
+                // │  Ya accedido a los nameTile entonces ya tengo acceso a  │
+                // │                  su ubicacion en RUles                  │
+                // ╰─────────────────────────────────────────────────────────╯
+
                 // Look up
                 if (j > 0) {
-                    const up = celda.up
+                    const up = grid[i + (j - 1) * DIM]
                     let validOptions = []
-
                     for (const option of up.options) {
                         const valid = rules[option][2]
                         validOptions = validOptions.concat(valid)
@@ -224,7 +268,7 @@ function draw() {
                 }
                 // Look right
                 if (i < DIM - 1) {
-                    const right = celda.right
+                    const right = grid[i + 1 + j * DIM]
                     let validOptions = []
 
                     for (const option of right.options) {
@@ -235,7 +279,7 @@ function draw() {
                 }
                 // Look down
                 if (j < DIM - 1) {
-                    const down = celda.down
+                    const down = grid[i + (j + 1) * DIM]
                     let validOptions = []
 
                     for (const option of down.options) {
@@ -247,7 +291,7 @@ function draw() {
 
                 // Look left
                 if (i > 0) {
-                    const left = celda.left
+                    const left = grid[i - 1 + j * DIM]
                     let validOptions = []
 
                     for (const option of left.options) {
