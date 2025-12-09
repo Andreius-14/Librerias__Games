@@ -41,62 +41,53 @@ const LEFT = 4
 //
 //           Esto hace que leer las reglas sea literal “tabla de compatibilidad”.
 
-const rules = [
-    //  ╭─────────────────╮
-    //  │      blank      │
-    //  ╰─────────────────╯
-    [
-        /* [↑] */[BLANK, UP],
-        /* [→] */[BLANK, RIGHT],
-        /* [↓] */[BLANK, DOWN],
-        /* [←] */[BLANK, LEFT]
-    ],
-    //  ╭─────────────────╮
-    //  │        UP       │
-    //  ╰─────────────────╯
-    [
-        /* [↑] */[RIGHT, LEFT, DOWN],
-        /* [→] */[LEFT, UP, DOWN],
-        /* [↓] */[BLANK, DOWN],
-        /* [←] */[RIGHT, UP, DOWN]
-    ],
-    //  ╭─────────────────╮
-    //  │      Right      │
-    //  ╰─────────────────╯
-
-    [
-        /* [↑] */[RIGHT, LEFT, DOWN],
-        /* [→] */[LEFT, UP, DOWN],
-        /* [↓] */[RIGHT, LEFT, UP],
-        /* [←] */[BLANK, LEFT]
-    ],
-    //  ╭─────────────────╮
-    //  │      Down       │
-    //  ╰─────────────────╯
-    [
-        /* [↑] */[BLANK, UP],
-        /* [→] */[LEFT, UP, DOWN],
-        /* [↓] */[RIGHT, LEFT, UP],
-        /* [←] */[RIGHT, UP, DOWN]
-    ],
-    //  ╭─────────────────╮
-    //  │       Left      │
-    //  ╰─────────────────╯
-    [
-        /* [↑] */[RIGHT, LEFT, DOWN],
-        /* [→] */[BLANK, RIGHT],
-        /* [↓] */[RIGHT, LEFT, UP], // ↓
-        /* [←] */[UP, DOWN, RIGHT] // ←
-    ]
-]
-
 //          ╭─────────────────────────────────────────────────────────╮
 //          │                         Clases                          │
 //          ╰─────────────────────────────────────────────────────────╯
 class Tile {
     constructor(img, edges) {
         this.img = img
+
+        // Logica de Cañerias
         this.edges = edges
+
+        // Save Rules Validas
+        this.up = []
+        this.right = []
+        this.down = []
+        this.left = []
+    }
+
+    //╭─────────────────────────────────────────────────────────╮
+    //│  Generate Rules; Como le estoy pasando aqui es un tile  │
+    //│                y el grupo total de tiles                │
+    //╰─────────────────────────────────────────────────────────╯
+    analyze(tiles) {
+        // connection for up
+        //╭─────────────────────────────────────────────────────────╮
+        //│ Comapro que Conectores sean compatibles, Si es el caso  │
+        //│     el Indice del Compatible se pasa a Rule Valido      │
+        //╰─────────────────────────────────────────────────────────╯
+        //
+        for (let i = 0; i < tiles.length; i++) {
+            const tile = tiles[i]
+            // UP
+            if (tile.edges[2] == this.edges[0]) {
+                this.up.push(i)
+            }
+            // Right
+            if (tile.edges[3] == this.edges[1]) {
+                this.right.push(i)
+            }
+            // Down
+            if (tile.edges[0] == this.edges[2]) {
+                this.down.push(i)
+            }
+            // Left
+            if (tile.edges[1] == this.edges[3]) {
+                this.left.push(i)
+            }
+        }
     }
 
     // ── significa q de una imagen , crea 4 ──
@@ -120,6 +111,21 @@ class Tile {
         return new Tile(newImg, newEdges)
     }
 }
+
+class Cell {
+    constructor(value) {
+        this.collapsed = false
+
+        if (value instanceof Array) {
+            this.options = value
+        } else {
+            this.options = []
+            for (let i = 0; i < value; i++) {
+                this.options[i] = i
+            }
+        }
+    }
+}
 //          ╭─────────────────────────────────────────────────────────╮
 //          │                        Funciones                        │
 //          ╰─────────────────────────────────────────────────────────╯
@@ -130,26 +136,33 @@ function preload() {
     // Carga Basica
     tileImages[0] = loadImage(`${path}/blank.png`)
     tileImages[1] = loadImage(`${path}/up.png`)
-
 }
 
 // Array de Objetos
 function setup() {
     createCanvas(600, 600)
 
-    // Carga de Imagenes + Extra Rotadas
+    // load Image + Rotate
     tiles[0] = new Tile(tileImages[0], [0, 0, 0, 0])
     tiles[1] = new Tile(tileImages[1], [1, 1, 0, 1])
     tiles[2] = tiles[1].rotate(1)
     tiles[3] = tiles[1].rotate(2)
     tiles[4] = tiles[1].rotate(3)
 
+    // Run
+    //╭─────────────────────────────────────────────────────────╮
+    //│  Generate Rules; Como le estoy pasando aqui es un tile  │
+    //│                y el grupo total de tiles                │
+    //╰─────────────────────────────────────────────────────────╯
+    for (let i = 0; i < tiles.length; i++) {
+        const tile = tiles[i]
+        tile.analyze(tiles)
+    }
+
+    // Creando Cell
     for (let i = 0; i < DIM * DIM; i++) {
         // Propiedades x Celda
-        grid[i] = {
-            collapsed: false,
-            options: [BLANK, UP, RIGHT, DOWN, LEFT]
-        }
+        grid[i] = new Cell(tiles.length)
     }
 
     // Reglas que Opciones tiene la Posicion
@@ -196,7 +209,7 @@ function draw() {
                 // traduce la unica opcion que posee a Imagen
                 const index = cell.options[0]
 
-                //Instancia Tile - Propiedad Img
+                // Instancia Tile - Propiedad Img
                 image(tiles[index].img, i * w, j * h, w, h)
             } else {
                 fill(0)
@@ -273,7 +286,7 @@ function draw() {
                 // │     Pasa por una capa de DEPURACION -- por cada IF,     │
                 // │Dejando aquel que cumple las restriciones de los vecinos │
                 // ╰─────────────────────────────────────────────────────────╯
-                const options = [BLANK, UP, RIGHT, DOWN, LEFT]
+                const options = new Array(tiles.length).fill(0).map((x, i) => i)
 
                 // ──────────────── recorre lados ────────────────
                 // Se ejecuta en la Celda Vacia
@@ -302,7 +315,7 @@ function draw() {
                     const up = grid[i + (j - 1) * DIM]
                     let validOptions = []
                     for (const option of up.options) {
-                        const valid = rules[option][2]
+                        const valid = tiles[option].down
                         validOptions = validOptions.concat(valid)
                     }
                     checkValid(options, validOptions)
@@ -313,7 +326,7 @@ function draw() {
                     let validOptions = []
 
                     for (const option of right.options) {
-                        const valid = rules[option][3]
+                        const valid = tiles[option].left
                         validOptions = validOptions.concat(valid)
                     }
                     checkValid(options, validOptions)
@@ -324,7 +337,7 @@ function draw() {
                     let validOptions = []
 
                     for (const option of down.options) {
-                        const valid = rules[option][0]
+                        const valid = tiles[option].up
                         validOptions = validOptions.concat(valid)
                     }
                     checkValid(options, validOptions)
@@ -336,16 +349,13 @@ function draw() {
                     let validOptions = []
 
                     for (const option of left.options) {
-                        const valid = rules[option][1]
+                        const valid = tiles[option].right
                         validOptions = validOptions.concat(valid)
                     }
                     checkValid(options, validOptions)
                 }
 
-                nextGrid[index] = {
-                    options,
-                    collapsed: false
-                }
+                nextGrid[index] = new Cell(options)
             }
         }
     }
