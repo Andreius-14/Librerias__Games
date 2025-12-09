@@ -1,10 +1,11 @@
 /* eslint indent: "off" */
 /* eslint-disable space-before-function-paren */
-
+// import { Tile } from './tiles.js'
 //          ╭─────────────────────────────────────────────────────────╮
 //          │                        Variables                        │
 //          ╰─────────────────────────────────────────────────────────╯
 const tiles = []
+const tileImages = []
 let grid = []
 const DIM = 8
 
@@ -90,20 +91,59 @@ const rules = [
 ]
 
 //          ╭─────────────────────────────────────────────────────────╮
+//          │                         Clases                          │
+//          ╰─────────────────────────────────────────────────────────╯
+class Tile {
+    constructor(img, edges) {
+        this.img = img
+        this.edges = edges
+    }
+
+    // ── significa q de una imagen , crea 4 ──
+    rotate(num) {
+        // Image Rotation Logic
+        const w = this.img.width
+        const h = this.img.height
+        const newImg = createGraphics(w, h)
+        newImg.imageMode(CENTER)
+        newImg.translate(w / 2, h / 2)
+        newImg.rotate(HALF_PI * num)
+        newImg.image(this.img, 0, 0)
+
+        // Data/Edge Rotation Logic
+        const newEdges = []
+        const len = this.edges.length
+        for (let i = 0; i < len; i++) {
+            newEdges[i] = this.edges[(i - num + len) % len]
+        }
+
+        return new Tile(newImg, newEdges)
+    }
+}
+//          ╭─────────────────────────────────────────────────────────╮
 //          │                        Funciones                        │
 //          ╰─────────────────────────────────────────────────────────╯
 // Array de Imagen
 function preload() {
-    tiles[0] = loadImage('./tiles/blank.png')
-    tiles[1] = loadImage('./tiles/up.png')
-    tiles[2] = loadImage('./tiles/right.png')
-    tiles[3] = loadImage('./tiles/down.png')
-    tiles[4] = loadImage('./tiles/left.png')
+    const path = 'tiles'
+
+    // Carga Basica
+    tileImages[0] = loadImage(`${path}/blank.png`)
+    tileImages[1] = loadImage(`${path}/up.png`)
+
 }
 
 // Array de Objetos
 function setup() {
     createCanvas(600, 600)
+
+    // Carga de Imagenes + Extra Rotadas
+    tiles[0] = new Tile(tileImages[0], [0, 0, 0, 0])
+    tiles[1] = new Tile(tileImages[1], [1, 1, 0, 1])
+    tiles[2] = tiles[1].rotate(1)
+    tiles[3] = tiles[1].rotate(2)
+    tiles[4] = tiles[1].rotate(3)
+
     for (let i = 0; i < DIM * DIM; i++) {
         // Propiedades x Celda
         grid[i] = {
@@ -155,7 +195,9 @@ function draw() {
             if (cell.collapsed) {
                 // traduce la unica opcion que posee a Imagen
                 const index = cell.options[0]
-                image(tiles[index], i * w, j * h, w, h)
+
+                //Instancia Tile - Propiedad Img
+                image(tiles[index].img, i * w, j * h, w, h)
             } else {
                 fill(0)
                 stroke(255)
@@ -168,7 +210,6 @@ function draw() {
     //          │                  Logica -  Entropia Minima              │
     //          ╰─────────────────────────────────────────────────────────╯
 
-    // Duplica
     // GameOver -- Si no hay casillas que llenar Detiene todo
     // Filtra -- Casillas sin Imagen
     // Ordena -- Menor a Mayor
