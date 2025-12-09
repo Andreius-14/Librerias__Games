@@ -7,7 +7,7 @@
 const tiles = []
 const tileImages = []
 let grid = []
-const DIM = 8
+const DIM = 22
 
 const BLANK = 0
 const UP = 1
@@ -131,23 +131,51 @@ class Cell {
 //          ╰─────────────────────────────────────────────────────────╯
 // Array de Imagen
 function preload() {
-    const path = 'tiles'
-
+    const path = 'circuit'
+    // Loaded and created the tiles
+    tileImages[0] = loadImage(`${path}/0.png`);
+    tileImages[1] = loadImage(`${path}/1.png`);
+    tileImages[2] = loadImage(`${path}/2.png`);
+    tileImages[3] = loadImage(`${path}/3.png`);
+    tileImages[4] = loadImage(`${path}/6.png`);
+    tileImages[5] = loadImage(`${path}/7.png`);
+    tileImages[6] = loadImage(`${path}/8.png`);
+    tileImages[7] = loadImage(`${path}/9.png`);
+    tileImages[8] = loadImage(`${path}/10.png`);
+    tileImages[9] = loadImage(`${path}/11.png`);
+    tileImages[10] = loadImage(`${path}/12.png`);
     // Carga Basica
-    tileImages[0] = loadImage(`${path}/blank.png`)
-    tileImages[1] = loadImage(`${path}/up.png`)
+    // tileImages[0] = loadImage(`${path}/blank.png`)
+    // tileImages[1] = loadImage(`${path}/up.png`)
 }
 
 // Array de Objetos
 function setup() {
     createCanvas(600, 600)
 
+    tiles[0] = new Tile(tileImages[0], [0, 0, 0, 0]);
+    tiles[1] = new Tile(tileImages[1], [1, 1, 1, 1]);
+    tiles[2] = new Tile(tileImages[2], [1, 2, 1, 1]);
+    tiles[3] = new Tile(tileImages[3], [1, 3, 1, 3]);
+    tiles[4] = new Tile(tileImages[4], [1, 2, 1, 2]);
+    tiles[5] = new Tile(tileImages[5], [3, 2, 3, 2]);
+    tiles[6] = new Tile(tileImages[6], [3, 1, 2, 1]);
+    tiles[7] = new Tile(tileImages[7], [2, 2, 1, 2]);
+    tiles[8] = new Tile(tileImages[8], [2, 2, 2, 2]);
+    tiles[9] = new Tile(tileImages[9], [2, 2, 1, 1]);
+    tiles[10] = new Tile(tileImages[10], [1, 2, 1, 2]);
+
+    for (let i = 0; i < 11; i++) {
+        for (let j = 0; j < 4; j++) {
+            tiles.push(tiles[i].rotate(j))
+        }
+    }
     // load Image + Rotate
-    tiles[0] = new Tile(tileImages[0], [0, 0, 0, 0])
-    tiles[1] = new Tile(tileImages[1], [1, 1, 0, 1])
-    tiles[2] = tiles[1].rotate(1)
-    tiles[3] = tiles[1].rotate(2)
-    tiles[4] = tiles[1].rotate(3)
+    // tiles[0] = new Tile(tileImages[0], [0, 0, 0, 0])
+    // tiles[1] = new Tile(tileImages[1], [1, 1, 0, 1])
+    // tiles[2] = tiles[1].rotate(1)
+    // tiles[3] = tiles[1].rotate(2)
+    // tiles[4] = tiles[1].rotate(3)
 
     // Run
     //╭─────────────────────────────────────────────────────────╮
