@@ -44,55 +44,73 @@ const LEFT = 4
 //          ╭─────────────────────────────────────────────────────────╮
 //          │                         Clases                          │
 //          ╰─────────────────────────────────────────────────────────╯
+
+// Reverse a string
+function reverseString(s) {
+    let arr = s.split('')
+    arr = arr.reverse()
+    return arr.join('')
+}
+
+// Compare if one edge matches the reverse of another
+function compareEdge(a, b) {
+    return a == reverseString(b)
+}
+
+// Class for each tile
 class Tile {
-    constructor(img, edges) {
+    constructor(img, edges, i) {
         this.img = img
-
-        // Logica de Cañerias
         this.edges = edges
-
-        // Save Rules Validas
         this.up = []
         this.right = []
         this.down = []
         this.left = []
+
+        if (i !== undefined) {
+            this.index = i
+        }
     }
 
-    //╭─────────────────────────────────────────────────────────╮
-    //│  Generate Rules; Como le estoy pasando aqui es un tile  │
-    //│                y el grupo total de tiles                │
-    //╰─────────────────────────────────────────────────────────╯
+    // ╭─────────────────────────────────────────────────────────╮
+    // │  Generate Rules; Como le estoy pasando aqui es un tile  │
+    // │                y el grupo total de tiles                │
+    // ╰─────────────────────────────────────────────────────────╯
+    // Analyze and find matching edges with other tiles
     analyze(tiles) {
-        // connection for up
-        //╭─────────────────────────────────────────────────────────╮
-        //│ Comapro que Conectores sean compatibles, Si es el caso  │
-        //│     el Indice del Compatible se pasa a Rule Valido      │
-        //╰─────────────────────────────────────────────────────────╯
+        // ╭─────────────────────────────────────────────────────────╮
+        // │ Comapro que Conectores sean compatibles, Si es el caso  │
+        // │     el Indice del Compatible se pasa a Rule Valido      │
+        // ╰─────────────────────────────────────────────────────────╯
         //
         for (let i = 0; i < tiles.length; i++) {
             const tile = tiles[i]
-            // UP
-            if (tile.edges[2] == this.edges[0]) {
+
+            // Skip if both tiles are tile 5
+            if (tile.index == 5 && this.index == 5) continue
+
+            // Check if the current tile's bottom edge matches this tile's top edge
+            if (compareEdge(tile.edges[2], this.edges[0])) {
                 this.up.push(i)
             }
-            // Right
-            if (tile.edges[3] == this.edges[1]) {
+            // Check if the current tile's left edge matches this tile's right edge
+            if (compareEdge(tile.edges[3], this.edges[1])) {
                 this.right.push(i)
             }
-            // Down
-            if (tile.edges[0] == this.edges[2]) {
+            // Check if the current tile's top edge matches this tile's bottom edge
+            if (compareEdge(tile.edges[0], this.edges[2])) {
                 this.down.push(i)
             }
-            // Left
-            if (tile.edges[1] == this.edges[3]) {
+            // Check if the current tile's right edge matches this tile's left edge
+            if (compareEdge(tile.edges[1], this.edges[3])) {
                 this.left.push(i)
             }
         }
     }
 
+    // Rotate the tile image and edges
     // ── significa q de una imagen , crea 4 ──
     rotate(num) {
-        // Image Rotation Logic
         const w = this.img.width
         const h = this.img.height
         const newImg = createGraphics(w, h)
@@ -101,14 +119,12 @@ class Tile {
         newImg.rotate(HALF_PI * num)
         newImg.image(this.img, 0, 0)
 
-        // Data/Edge Rotation Logic
         const newEdges = []
         const len = this.edges.length
         for (let i = 0; i < len; i++) {
             newEdges[i] = this.edges[(i - num + len) % len]
         }
-
-        return new Tile(newImg, newEdges)
+        return new Tile(newImg, newEdges, this.index)
     }
 }
 
@@ -132,41 +148,32 @@ class Cell {
 // Array de Imagen
 function preload() {
     const path = 'circuit'
-    // Loaded and created the tiles
-    tileImages[0] = loadImage(`${path}/0.png`);
-    tileImages[1] = loadImage(`${path}/1.png`);
-    tileImages[2] = loadImage(`${path}/2.png`);
-    tileImages[3] = loadImage(`${path}/3.png`);
-    tileImages[4] = loadImage(`${path}/6.png`);
-    tileImages[5] = loadImage(`${path}/7.png`);
-    tileImages[6] = loadImage(`${path}/8.png`);
-    tileImages[7] = loadImage(`${path}/9.png`);
-    tileImages[8] = loadImage(`${path}/10.png`);
-    tileImages[9] = loadImage(`${path}/11.png`);
-    tileImages[10] = loadImage(`${path}/12.png`);
-    // Carga Basica
-    // tileImages[0] = loadImage(`${path}/blank.png`)
-    // tileImages[1] = loadImage(`${path}/up.png`)
+
+    for (let i = 0; i < 13; i++) {
+        tileImages[i] = loadImage(`${path}/${i}.png`)
+    }
 }
 
 // Array de Objetos
 function setup() {
     createCanvas(600, 600)
+    // Initialize tiles with images and edges
+    tiles[0] = new Tile(tileImages[0], ['AAA', 'AAA', 'AAA', 'AAA'])
+    tiles[1] = new Tile(tileImages[1], ['BBB', 'BBB', 'BBB', 'BBB'])
+    tiles[2] = new Tile(tileImages[2], ['BBB', 'BCB', 'BBB', 'BBB'])
+    tiles[3] = new Tile(tileImages[3], ['BBB', 'BDB', 'BBB', 'BDB'])
+    tiles[4] = new Tile(tileImages[4], ['ABB', 'BCB', 'BBA', 'AAA'])
+    tiles[5] = new Tile(tileImages[5], ['ABB', 'BBB', 'BBB', 'BBA'])
+    tiles[6] = new Tile(tileImages[6], ['BBB', 'BCB', 'BBB', 'BCB'])
+    tiles[7] = new Tile(tileImages[7], ['BDB', 'BCB', 'BDB', 'BCB'])
+    tiles[8] = new Tile(tileImages[8], ['BDB', 'BBB', 'BCB', 'BBB'])
+    tiles[9] = new Tile(tileImages[9], ['BCB', 'BCB', 'BBB', 'BCB'])
+    tiles[10] = new Tile(tileImages[10], ['BCB', 'BCB', 'BCB', 'BCB'])
+    tiles[11] = new Tile(tileImages[11], ['BCB', 'BCB', 'BBB', 'BBB'])
+    tiles[12] = new Tile(tileImages[12], ['BBB', 'BCB', 'BBB', 'BCB'])
 
-    tiles[0] = new Tile(tileImages[0], [0, 0, 0, 0]);
-    tiles[1] = new Tile(tileImages[1], [1, 1, 1, 1]);
-    tiles[2] = new Tile(tileImages[2], [1, 2, 1, 1]);
-    tiles[3] = new Tile(tileImages[3], [1, 3, 1, 3]);
-    tiles[4] = new Tile(tileImages[4], [1, 2, 1, 2]);
-    tiles[5] = new Tile(tileImages[5], [3, 2, 3, 2]);
-    tiles[6] = new Tile(tileImages[6], [3, 1, 2, 1]);
-    tiles[7] = new Tile(tileImages[7], [2, 2, 1, 2]);
-    tiles[8] = new Tile(tileImages[8], [2, 2, 2, 2]);
-    tiles[9] = new Tile(tileImages[9], [2, 2, 1, 1]);
-    tiles[10] = new Tile(tileImages[10], [1, 2, 1, 2]);
-
-    for (let i = 0; i < 11; i++) {
-        for (let j = 0; j < 4; j++) {
+    for (let i = 2; i < 14; i++) {
+        for (let j = 1; j < 4; j++) {
             tiles.push(tiles[i].rotate(j))
         }
     }
@@ -178,26 +185,25 @@ function setup() {
     // tiles[4] = tiles[1].rotate(3)
 
     // Run
-    //╭─────────────────────────────────────────────────────────╮
-    //│  Generate Rules; Como le estoy pasando aqui es un tile  │
-    //│                y el grupo total de tiles                │
-    //╰─────────────────────────────────────────────────────────╯
+    // ╭─────────────────────────────────────────────────────────╮
+    // │  Generate Rules; Como le estoy pasando aqui es un tile  │
+    // │                y el grupo total de tiles                │
+    // ╰─────────────────────────────────────────────────────────╯
     for (let i = 0; i < tiles.length; i++) {
         const tile = tiles[i]
         tile.analyze(tiles)
     }
 
+    startOver()
+}
+
+function startOver() {
     // Creando Cell
     for (let i = 0; i < DIM * DIM; i++) {
         // Propiedades x Celda
         grid[i] = new Cell(tiles.length)
     }
-
-    // Reglas que Opciones tiene la Posicion
-    //    grid[2].options = [BLANK, UP]
-    //    grid[0].options = [BLANK, UP]
 }
-
 // Estás dejando en arr solo los valores que están en valid
 function checkValid(arr, valid) {
     for (let i = arr.length - 1; i >= 0; i--) {
@@ -292,6 +298,12 @@ function draw() {
     const pick = random(cell.options)
 
     cell.collapsed = true
+
+    if (pick === undefined) {
+        startOver()
+        return
+    }
+
     cell.options = [pick]
 
     // Mensaje
