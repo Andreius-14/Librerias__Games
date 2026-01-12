@@ -1,6 +1,5 @@
 /* eslint indent: "off" */
 /* eslint-disable space-before-function-paren */
-// import { Tile } from './tiles.js'
 //          ╭─────────────────────────────────────────────────────────╮
 //          │                        Variables                        │
 //          ╰─────────────────────────────────────────────────────────╯
@@ -15,52 +14,32 @@ const RIGHT = 2
 const DOWN = 3
 const LEFT = 4
 
-//          ╭─────────────────────────────────────────────────────────╮
-//          │                 Restricciones por Tile                  │
-//          ╰─────────────────────────────────────────────────────────╯
-//           rules[tile][dir] indica QUÉ tiles pueden colocarse en la
-//           dirección "dir" respecto al tile actual.
-//
-//           dir index:
-//          ╭─────────────────────────────────────────────────────────╮
-//          │     0 = ↑  (qué puede ir ARRIBA de este tile)           │
-//          │     1 = →  (qué puede ir a la DERECHA de este tile)     │
-//          │     2 = ↓  (qué puede ir ABAJO de este tile)            │
-//          │     3 = ←  (qué puede ir a la IZQUIERDA de este tile)   │
-//          ╰─────────────────────────────────────────────────────────╯
-//
-//           Ejemplo visual del concepto:
-//
-//          ╭─────────────────────────────────────────────────────────────╮
-//          │ ┌─────┐        rules[X][0] = lista de tiles permitidos aquí │
-//          │ │  ?  │   ↑                                                 │
-//          │ ├─────┤   X     ← tile actual                               │
-//          │ │  X  │   ↓                                                 │
-//          │ └─────┘        rules[X][2] = lista de tiles permitidos aquí │               │
-//          ╰─────────────────────────────────────────────────────────────╯
-//
-//           Esto hace que leer las reglas sea literal “tabla de compatibilidad”.
-
-//          ╭─────────────────────────────────────────────────────────╮
-//          │                         Clases                          │
-//          ╰─────────────────────────────────────────────────────────╯
-
+//          ╭─────────────────╮
+//          │  tileImages[]   │ ─╮
+//          ╰─────────────────╯  │
+//          ╭─────────────────╮  │
+//       ╭─ │     tiles[]     │<─╯  new Tiles + Rules
+//       │  ╰─────────────────╯
+//       │  ╭─────────────────╮
+//       ╰─>│     grid[]      │ ─╮    new Cell
+//          ╰─────────────────╯  │
+//          ╭─────────────────╮  │
+//          │   nextGrid[]    │<─╯    new Cell
+//          ╰─────────────────╯
 //          ╭─────────────────────────────────────────────────────────╮
 //          │                        Funciones                        │
 //          ╰─────────────────────────────────────────────────────────╯
-// Array de Imagen
 function preload() {
     const path = 'circuit'
-
+    // Carga Imagen
     for (let i = 0; i < 13; i++) {
         tileImages[i] = loadImage(`${path}/${i}.png`)
     }
 }
 
-// Array de Objetos
 function setup() {
     createCanvas(600, 600)
-    // Initialize tiles with images and edges
+    // Imagen a Instancia
     tiles[0] = new Tile(tileImages[0], ['AAA', 'AAA', 'AAA', 'AAA'])
     tiles[1] = new Tile(tileImages[1], ['BBB', 'BBB', 'BBB', 'BBB'])
     tiles[2] = new Tile(tileImages[2], ['BBB', 'BCB', 'BBB', 'BBB'])
@@ -75,23 +54,13 @@ function setup() {
     tiles[11] = new Tile(tileImages[11], ['BCB', 'BCB', 'BBB', 'BBB'])
     tiles[12] = new Tile(tileImages[12], ['BBB', 'BCB', 'BBB', 'BCB'])
 
+    // Duplica Rotando
     for (let i = 2; i < 14; i++) {
         for (let j = 1; j < 4; j++) {
             tiles.push(tiles[i].rotate(j))
         }
     }
-    // load Image + Rotate
-    // tiles[0] = new Tile(tileImages[0], [0, 0, 0, 0])
-    // tiles[1] = new Tile(tileImages[1], [1, 1, 0, 1])
-    // tiles[2] = tiles[1].rotate(1)
-    // tiles[3] = tiles[1].rotate(2)
-    // tiles[4] = tiles[1].rotate(3)
-
-    // Run
-    // ╭─────────────────────────────────────────────────────────╮
-    // │  Generate Rules; Como le estoy pasando aqui es un tile  │
-    // │                y el grupo total de tiles                │
-    // ╰─────────────────────────────────────────────────────────╯
+    // Genera Rules - Para UP-DOWN-LEFT-RIGHT Guarda en el [new Tile]
     for (let i = 0; i < tiles.length; i++) {
         const tile = tiles[i]
         tile.analyze(tiles)
@@ -101,30 +70,32 @@ function setup() {
 }
 
 function startOver() {
-    // Creando Cell
+    // Creando Cell - Reserva el espacio de las opciones posibles que lo llenaran
     for (let i = 0; i < DIM * DIM; i++) {
-        // Propiedades x Celda
         grid[i] = new Cell(tiles.length)
     }
 }
-// Estás dejando en arr solo los valores que están en valid
 function checkValid(arr, valid) {
+    // Depura: Deja Valid en Arr
     for (let i = arr.length - 1; i >= 0; i--) {
-        // ARR: [BLANK, UP, RIGHT, DOWN, LEFT]
-        // VALID: [BLANK, RIGHT]
-        // result :[BLANK, RIGHT]
         const element = arr[i]
-
-        // ARR - VALID == ARRAY MAS PEQUEÑO
-        if (!valid.includes(element)) {
-            arr.splice(i, 1)
-        }
+        if (!valid.includes(element)) arr.splice(i, 1)
     }
 }
 function mousePressed() {
     redraw()
 }
 
+function vecino_depurador(options, gps_Vecino, myPosition) {
+    const vecino = grid[gps_Vecino]
+    let validOptions = []
+
+    for (const option of vecino.options) {
+        const valid = tiles[option][myPosition]
+        validOptions = validOptions.concat(valid)
+    }
+    checkValid(options, validOptions)
+}
 //          ╭─────────────────────────────────────────────────────────╮
 //          │                          Bucle                          │
 //          ╰─────────────────────────────────────────────────────────╯
@@ -143,12 +114,11 @@ function draw() {
             const cell = grid[i + j * DIM]
 
             if (cell.collapsed) {
-                // traduce la unica opcion que posee a Imagen
+                // Imprime - Img
                 const index = cell.options[0]
-
-                // Instancia Tile - Propiedad Img
                 image(tiles[index].img, i * w, j * h, w, h)
             } else {
+                // Black - Grid
                 fill(0)
                 stroke(255)
                 rect(i * w, j * h, w, h)
@@ -159,12 +129,6 @@ function draw() {
     //          ╭─────────────────────────────────────────────────────────╮
     //          │                  Logica -  Entropia Minima              │
     //          ╰─────────────────────────────────────────────────────────╯
-
-    // GameOver -- Si no hay casillas que llenar Detiene todo
-    // Filtra -- Casillas sin Imagen
-    // Ordena -- Menor a Mayor
-    // Group  -- Agrupa las celdas con Menores Opciones. ejm: las de 1 Opcion ||  las de 2 Opciones
-
     // [Duplica]
     let gridCopy = grid.slice()
 
@@ -180,7 +144,7 @@ function draw() {
         return a.options.length - b.options.length
     })
 
-    // [Group]
+    // [Group] las menores Opciones
     const len = gridCopy[0].options.length
     let stopIndex = 0
 
@@ -214,7 +178,7 @@ function draw() {
     // console.log(gridCopy)
 
     //          ╭─────────────────────────────────────────────────────────╮
-    //          │               Calcula el Siguiente Estado               │
+    //          │                    Siguiente Estado                     │
     //          ╰─────────────────────────────────────────────────────────╯
     const nextGrid = []
     for (let j = 0; j < DIM; j++) {
@@ -231,73 +195,25 @@ function draw() {
                 // ╰─────────────────────────────────────────────────────────╯
                 const options = new Array(tiles.length).fill(0).map((x, i) => i)
 
-                // ──────────────── recorre lados ────────────────
-                // Se ejecuta en la Celda Vacia
-                // La celda Vacia - Tiene Vecinos
-
-                // ──────────────── Logica  UP ────────────────
-                // Options  : los posibles TILES Del Vecino          >>> options: [BLANK, UP, RIGHT, DOWN, LEFT]
-                // Options  : Si esta lleno tiene 1 Tile Definido    >>> options: [valor_establecido]
-                //
-                // Ubicacion Actual: Abajo del Vecino
-                // Restriccion     : Elejimos la restriccion Abajo del Vecino  [2]
-                // ╭──────╮
-                // │[0][↑]│
-                // │[1][→]│
-                // │[2][↓]│
-                // │[3][←]│
-                // ╰──────╯
-
-                // ╭─────────────────────────────────────────────────────────╮
-                // │  Ya accedido a los nameTile entonces ya tengo acceso a  │
-                // │                  su ubicacion en RUles                  │
-                // ╰─────────────────────────────────────────────────────────╯
-
-                // Look up
-                if (j > 0) {
-                    const up = grid[i + (j - 1) * DIM]
-                    let validOptions = []
-                    for (const option of up.options) {
-                        const valid = tiles[option].down
-                        validOptions = validOptions.concat(valid)
-                    }
-                    checkValid(options, validOptions)
+                const exist = {
+                    up: j > 0,
+                    right: i < (DIM - 1),
+                    down: j < (DIM - 1),
+                    left: i > 0
                 }
-                // Look right
-                if (i < DIM - 1) {
-                    const right = grid[i + 1 + j * DIM]
-                    let validOptions = []
-
-                    for (const option of right.options) {
-                        const valid = tiles[option].left
-                        validOptions = validOptions.concat(valid)
-                    }
-                    checkValid(options, validOptions)
-                }
-                // Look down
-                if (j < DIM - 1) {
-                    const down = grid[i + (j + 1) * DIM]
-                    let validOptions = []
-
-                    for (const option of down.options) {
-                        const valid = tiles[option].up
-                        validOptions = validOptions.concat(valid)
-                    }
-                    checkValid(options, validOptions)
+                const gps = {
+                    up: i + (j - 1) * DIM,
+                    right: i + 1 + j * DIM,
+                    down: i + (j + 1) * DIM,
+                    left: i - 1 + j * DIM
                 }
 
-                // Look left
-                if (i > 0) {
-                    const left = grid[i - 1 + j * DIM]
-                    let validOptions = []
+                if (exist.up) vecino_depurador(options, gps.up, 'down')
+                if (exist.right) vecino_depurador(options, gps.right, 'left')
+                if (exist.down) vecino_depurador(options, gps.down, 'up')
+                if (exist.left) vecino_depurador(options, gps.left, 'right')
 
-                    for (const option of left.options) {
-                        const valid = tiles[option].right
-                        validOptions = validOptions.concat(valid)
-                    }
-                    checkValid(options, validOptions)
-                }
-
+                // New [CASILLA] Con las opciones Depuradas
                 nextGrid[index] = new Cell(options)
             }
         }

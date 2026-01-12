@@ -11,7 +11,8 @@ class Cell {
             // Set options to the provided array
             this.options = value;
         } else {
-            // Fill array with all the options
+            // Fill array with all the option
+            // [0, 1, 2, ..., tiles.length - 1]s
             this.options = [];
             for (let i = 0; i < value; i++) {
                 this.options[i] = i;
