@@ -1,0 +1,32 @@
+3D en Javascript usa 3 puntos importantes
+_____________________________________
+| 🌱 scene  | 🌱camera | 🌱renderer |
+
+
+- Tenemos diferentes camaras en Three.Js
+- Si hacemos lineas 2D La ventana es un plano cartesiano Normal
+
+
+https://codingpotions.com/threejs-introduccion
+
+Basico - ThreeJs Function
+_______________________________________________________
+| 🌱 init  | 🌱 onWindowResize | 🌱animate |🌱 render |
+
+
+
+Pasos Basicos
+  Añadir luces a la escena
+  controles de órbita de Three.js
+  posición y el tamaño del modelo para que se ajuste mejor a la pantalla.
+  Añadir un fondo 
+
+LIBRERIAS - IMPORT
+
+// three.js
+import * as THREE from "three";
+import Stats from "three/addons/libs/stats.module.js";                            // Informacion de Consumo
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";           // Control de Camara - Sensilla
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";   // Aumento de Realidad - Cuarto para el Objeto 3D
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";                  // Cargar Archivos
+import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";       
