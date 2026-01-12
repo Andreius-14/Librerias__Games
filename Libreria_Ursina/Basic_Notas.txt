@@ -1,0 +1,76 @@
+
+NOTAS - PROYECTOS ANALISADOS
+
+Metas:
+
+  🌱 Notebook for Dummies -- Analisis: Completos
+  🌱 Minecraft Ursina     -- Analisis: Completos
+  🌱 Examples Ursina      -- Analisis: En Proceso  --  https://www.ursinaengine.org/samples.html
+
+Nota:
+
+  🌱 Guia Mejorada ->  https://www.ursinaengine.org/api_reference.html
+  🌱 Trabajo -> 🔗 https://www.ursinaengine.org/ursina_for_dummies.html
+
+
+
+
+
+
+📁ursina                # the actual ursina module.
+    📁audio                 # built-in audio clips.
+    📁editor                # the 3d level editor for ursina.
+    📁fonts                 # built-in fonts.
+    📁models                # .blend files, source files, for built-in 3d models.
+        📁procedural            # classes for generating 3d models, like Cylinder, Quad and Terrain.
+    📁models_compressed     # .blend files converted to .ursinamesh.
+    📁prefabs               # higher level classes like Draggable, Slider, Sprite, etc.
+
+    📃__init__.py
+    📃application.py
+    📃audio.py
+
+
+=============================================================================================
+
+NOTAS - CODIGO
+
+# FUNCIONES 
+"""
+    combine() combina simplificando fusiona los elementos
+    invoke()      # [❓invoke] Se invoca a una funcion por Delay  
+
+    PhysicsEntity()
+    Sky()
+
+    ursfx()         Se utiliza para reproducir efectos de sonido
+    setattr()       establecer el valor de un atributo de un objeto
+    hasattr()       verificar si un objeto tiene un atributo específico
+
+    Desconocido -> Mesh()
+    Desconocido -> Sequence()
+    Desconocido -> time.dt * 10
+    Desconocido -> player.bullet_renderer.model.vertices
+
+"""       
+
+
+# IMPORTACIONES
+"""
+from ursina import *
+from ursina.prefabs.first_person_controller import FirstPersonController
+from perlin_noise import PerlinNoise
+"""
+
+# PROPIEDADES DE INSTANCIAS
+"""
+ La Entity
+        desconocido -- rotation
+        desconocido -- position
+
+        desconocido -- double_sided = True
+
+
+"""
+
+button_2.tooltip = Tooltip

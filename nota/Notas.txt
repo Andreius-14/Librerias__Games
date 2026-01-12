@@ -1,0 +1,64 @@
+
+🌱 **Ventana y Eventos:**
+    1. `pygame.init()`: Inicializa el motor de Pygame.
+    2. `pygame.display.set_mode()`: Crea una ventana de juego.
+    3. `pygame.display.set_caption()`: Establece el título de la ventana.
+    4. `pygame.event.get()`: Obtiene una lista de eventos del sistema.
+
+🌱 **Gráficos y Dibujo:**
+    1. `pygame.draw.line()`: Dibuja una línea en la ventana.
+       - `pygame.draw.line(surface, color, start, end, width)`
+    
+    2. `pygame.draw.circle()`: Dibuja un círculo en la ventana.
+       - `pygame.draw.circle(surface, color, center, radius)`
+    
+    3. `pygame.draw.rect()`: Dibuja un rectángulo en la ventana.
+       - `pygame.draw.rect(surface, color, rect)`
+    
+    4. `pygame.draw.polygon()`: Dibuja un polígono en la ventana.
+       - `pygame.draw.polygon(surface, color, points)`
+    
+    5. `pygame.draw.ellipse()`: Dibuja una elipse en la ventana.
+       - `pygame.draw.ellipse(surface, color, rect)`
+
+🌱 **Imágenes y Sprites:**
+    1. `pygame.image.load()`: Carga una imagen desde un archivo.
+    2. `pygame.Surface.blit()`: Dibuja una superficie en otra.
+    3. `pygame.sprite.Sprite()`: Define una clase base para sprites.
+    4. `pygame.sprite.Group()`: Administra un grupo de sprites.
+
+🌱 **Texto:**
+    1. `pygame.font.Font()`: Crea una fuente para renderizar texto.
+    2. `font.render()`: Renderiza texto en una superficie.
+
+🌱 **Sonido y Música:**
+    1. `pygame.mixer.Sound()`: Crea un objeto de sonido.
+    2. `pygame.mixer.music.load()`: Carga un archivo de música.
+    3. `pygame.mixer.Sound.play()`: Reproduce un sonido.
+
+🌱 **Colisiones y Detección:**
+    1. `pygame.sprite.spritecollide()`: Detecta colisiones entre sprites y grupos.
+    2. `pygame.Rect.colliderect()`: Detecta colisiones entre rectángulos.
+
+🌱 **Tiempo y Reloj:**
+    1. `pygame.time.Clock()`: Crea un objeto de reloj para gestionar el tiempo.
+    2. `clock.tick()`: Controla la velocidad de actualización de la ventana.
+
+🌱 **Input del Usuario:**
+    1. `pygame.key.get_pressed()`: Obtiene el estado de las teclas.
+    2. `event.type == pygame.KEYDOWN`: Detecta una tecla presionada.
+    3. `event.type == pygame.MOUSEBUTTONDOWN`: Detecta un clic del mouse.
+
+------------------------------
+
+    # Explicación para dibujar una línea
+    # 🖍️ pygame.draw.line(surface, color, start [tupla (x, y)], end [tupla (x, y)], width)
+    pygame.draw.line(screen, red, (100, 100), (300, 200), 5)
+
+    # Explicación para dibujar un círculo
+    # 🖍️ pygame.draw.circle(surface, color, center [tupla (x, y)], radius)
+    pygame.draw.circle(screen, green, (400, 300), 50)
+
+    # Explicación para dibujar un rectángulo
+    # 🖍️ pygame.draw.rect(surface, color, rect [tupla (x, y, width, height)])
+    pygame.draw.rect(screen, blue, (500, 400, 100, 50))
