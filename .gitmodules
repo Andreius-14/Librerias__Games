@@ -1,3 +1,4 @@
-[submodule "JS-Shared"]
-	path = ThreeJs_Vanilla/JS-Shared
+
+[submodule "_ThreeJs/Shared-js"]
+	path = _ThreeJs/Shared-js
 	url = git@github.com:Andreius-14/JS-Shared.git
