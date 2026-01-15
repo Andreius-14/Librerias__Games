@@ -2,14 +2,14 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import * as CANNON from "cannon-es";
-import { create, config, extra } from "../JS-Shared/threejs/Core/Escena.js";
+import { create, config, extra } from "../Shared-js/threejs/Core/Escena.js";
 
-import { FisicaBuilding } from "../JS-Shared/threejs/Fisica.js";
-import { WorldBuilder } from "../JS-Shared/threejs/Core/World.js";
+import { FisicaBuilding } from "../Shared-js/addons/_cannon-es.js";
+import { WorldBuilder } from "../Shared-js/threejs/Core/World.js";
 import {
-  EventoFullScreen,
-  EventoResize,
-} from "../JS-Shared/threejs/Core/Evento.js";
+    EventoFullScreen,
+    EventoResize,
+} from "../Shared-js/threejs/Core/Evento.js";
 
 //----------------------------------------------
 //                  CORE
@@ -63,9 +63,9 @@ cubeBody.position.set(0, 5, 0); // Posición inicial arriba
 
 const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
 const cubeMaterial = new THREE.MeshStandardMaterial({
-  color: 0x00aaff,
-  roughness: 0.3,
-  metalness: 0.2,
+    color: 0x00aaff,
+    roughness: 0.3,
+    metalness: 0.2,
 });
 const cubeMesh = new THREE.Mesh(cubeGeometry, cubeMaterial);
 cubeMesh.castShadow = true;
@@ -76,9 +76,9 @@ scene.add(cubeMesh);
 //----------------------------------------------
 
 function animate() {
-  // Step the physics world
-  Fisica.actualizar();
-  Fisica.asignarAFisica(cubeMesh, cubeBody);
+    // Step the physics world
+    Fisica.actualizar();
+    Fisica.asignarAFisica(cubeMesh, cubeBody);
 
-  renderer.render(scene, camera);
+    renderer.render(scene, camera);
 }

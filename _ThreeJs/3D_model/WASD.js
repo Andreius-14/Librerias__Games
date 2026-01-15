@@ -6,14 +6,14 @@ import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { RGBELoader } from "three/addons/loaders/RGBELoader.js";
 
-import { config, create, extra } from "../JS-Shared/threejs/Core/Escena.js";
-import { evento } from "../JS-Shared/threejs/Core/Evento.js";
+import { config, create, extra } from "../Shared-js/threejs/Core/Escena.js";
+import { evento } from "../Shared-js/threejs/Core/Evento.js";
 
-import { WorldBuilder } from "../JS-Shared/threejs/Core/World.js";
-import { LightBuilder } from "../JS-Shared/threejs/Luces.js";
-import { Model } from "../JS-Shared/threejs/Model.js";
-import { Texturas, Space } from "../JS-Shared/threejs/Texturas.js";
-import { Anime } from "../JS-Shared/threejs/animate.js";
+import { WorldBuilder } from "../Shared-js/threejs/Core/World.js";
+import { LightBuilder } from "../Shared-js/threejs/Luces.js";
+import { Model } from "../Shared-js/threejs/Model.js";
+import { Texturas, Space } from "../Shared-js/threejs/Texturas.js";
+import { Anime } from "../Shared-js/threejs/animate.js";
 
 let World, Light;
 

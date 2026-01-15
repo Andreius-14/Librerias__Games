@@ -1,11 +1,11 @@
 import * as THREE from "three";
-import { FisicaBuilding } from "../JS-Shared/threejs/Fisica.js";
-import { Mesh, geo, mat } from "../JS-Shared/threejs/Mesh.js";
+import { FisicaBuilding } from "../Shared-js/addons/_cannon-es.js";
+import { Mesh, geo, mat } from "../Shared-js/threejs/Mesh.js";
 import * as CANNON from "cannon-es";
-import { create, config, extra } from "../JS-Shared/threejs/Core/Escena.js";
-import { evento } from "../JS-Shared/threejs/Core/Evento.js";
-import { LightBuilder } from "../JS-Shared/threejs/Luces.js";
-import { WorldBuilder } from "../JS-Shared/threejs/Core/World.js";
+import { create, config, extra } from "../Shared-js/threejs/Core/Escena.js";
+import { evento } from "../Shared-js/threejs/Core/Evento.js";
+import { LightBuilder } from "../Shared-js/threejs/Luces.js";
+import { WorldBuilder } from "../Shared-js/threejs/Core/World.js";
 
 //----------------------------------------------
 //                  CORE
@@ -47,7 +47,7 @@ Luces.shadowDirecional(sol, { quality: 512, helper: true });
 const fisica = new FisicaBuilding();
 
 function animate() {
-  renderer.render(scene, camera);
-  controls.update();
-  stats.update();
+    renderer.render(scene, camera);
+    controls.update();
+    stats.update();
 }
